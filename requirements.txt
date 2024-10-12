@@ -1,0 +1,5 @@
+numpy
+asyncserial
+pytest
+toptica_lasersdk
+sipyco @ git+https://github.com/m-labs/sipyco.git@master#egg=sipyco
