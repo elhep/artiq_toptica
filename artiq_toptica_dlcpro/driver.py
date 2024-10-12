@@ -223,7 +223,7 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"Simulated: Channel {channel} temperature setpoint redout "
             f"{self.channel_temperature_setpoint[conv_channel]}"
         )
-        return self.channel_current_setpoint[conv_channel]
+        return self.channel_temperature_setpoint[conv_channel]
 
     async def get_channel_temperature_actual(self, channel):
         conv_channel = self.convert_channel(channel)
