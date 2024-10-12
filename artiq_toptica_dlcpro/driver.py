@@ -4,6 +4,7 @@ import abc
 import asyncio
 import logging
 import random
+
 from toptica.lasersdk.dlcpro.v2_2_0 import DLCpro, NetworkConnection
 
 
@@ -66,7 +67,7 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
 class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
     def __init__(self, device_ip):
         """Initialize the controller with the device IP address."""
-        self.device_ip = device_ip 
+        self.device_ip = device_ip
         self.dlc = None
         self.open_connection()
 
@@ -84,7 +85,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         return self.dlc.emission.get()
 
     def get_laser(self, laser_number):
-        laser_attr = f'laser{laser_number}'
+        laser_attr = f"laser{laser_number}"
         laser_instance = getattr(self.dlc, laser_attr, None)
         if laser_instance:
             return laser_instance
@@ -140,69 +141,94 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
 
 
 class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
-    pass
-#
-#class ArtiqIsegHvPsuSim(ArtiqIsegHvPsuInterface):
-#    def __init__(self):
-#        self.channel_voltage = 8 * [None]
-#        self.channel_current = 8 * [None]
-#        self.channel_on = 8 * [None]
-#        self.temperature = 42 + 10 * random.random()
-#
-#    async def set_channel_voltage(self, channel, voltage):
-#        self.channel_voltage[channel] = voltage
-#        logging.warning(f"Simulated: Setting channel {channel} voltage to {voltage}")
-#
-#    async def set_channel_current(self, channel, current):
-#        self.channel_current[channel] = current
-#        logging.warning(f"Simulated: Setting channel {channel} current to {current}")
-#
-#    async def set_channel_on(self, channel, channel_on):
-#        self.channel_on[channel] = channel_on
-#        if channel_on:
-#            logging.warning(f"Simulated: Turning channel {channel} ON")
-#        else:
-#            logging.warning(f"Simulated: Turning channel {channel } OFF")
-#
-#    async def get_channel_voltage(self, channel):
-#        logging.warning(
-#            f"Simulated: Channel {channel} voltage redout:"
-#            f"{self.channel_voltage[channel]}"
-#        )
-#        return self.channel_voltage[channel]
-#
-#    async def get_channel_current(self, channel):
-#        logging.warning(
-#            f"Simulated: Channel {channel} current redout: "
-#            f"{self.channel_current[channel]}"
-#        )
-#        return self.channel_current[channel]
-#
-#    async def get_channel_voltage_measured(self, channel):
-#        logging.warning(
-#            f"Simulated: Channel {channel} measured voltage redout: "
-#            f"{self.channel_voltage[channel] + random.random() - 0.5}"
-#        )
-#        return self.channel_voltage[channel]
-#
-#    async def get_channel_current_measured(self, channel):
-#        logging.warning(
-#            f"Simulated: Channel {channel} measured current redout: "
-#            f"{self.channel_current[channel] + random.random() - 0.5}"
-#        )
-#        return self.channel_current[channel]
-#
-#    async def get_channel_on(self, channel):
-#        logging.warning(
-#            f"Simulated: Channel {channel} state redout: {self.channel_on[channel]}"
-#        )
-#        return self.channel_on[channel]
-#
-#    async def get_temperature(self):
-#        logging.warning(f"Simulated: Temperature redout: {self.temperature}")
-#        return self.temperature
-#
-#    async def reset(self):
-#        self.channel_voltage = 8 * [None]
-#        self.channel_on = 8 * [None]
-#        logging.warning("Simulated: Resetting settings")
+    def __init__(self):
+        self.channel_current_on = 2 * [False]
+        self.channel_current_setpoint = 2 * [None]
+        self.channel_voltage_setpoint = 2 * [None]
+        self.channel_temperature_setpoint = 2 * [None]
+
+    def convert_channel(self, channel):
+        conv_channel = channel - 1
+        if conv_channel not in [0, 1]:
+            raise ValueError("Channel out of range")
+        return conv_channel
+
+    async def get_emission(self):
+        return True
+
+    async def get_channel_current_on(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} state redout "
+            f"{self.channel_current_on[conv_channel]}"
+        )
+        return self.channel_current_on[self.convert_channel(channel)]
+
+    async def set_channel_current_on(self, channel, channel_on):
+        self.channel_current_on[self.convert_channel(channel)] = channel_on
+        if channel_on:
+            logging.warning(f"Simulated: Turning channel {channel} ON")
+        else:
+            logging.warning(f"Simulated: Turning channel {channel } OFF")
+
+    async def set_channel_current(self, channel, current):
+        self.channel_current_setpoint[self.convert_channel(channel)] = current
+        logging.warning(f"Simulated: Setting channel {channel} current to {current}")
+
+    async def get_channel_current_setpoint(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} current setpoint redout "
+            f"{self.channel_current_setpoint[conv_channel]}"
+        )
+        return self.channel_current_setpoint[conv_channel]
+
+    async def get_channel_current_actual(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} current redout "
+            f"{self.channel_current_setpoint[conv_channel]}"
+        )
+        return self.channel_current_setpoint[conv_channel]
+
+    async def set_channel_voltage(self, channel, voltage):
+        self.channel_voltage_setpoint[self.convert_channel(channel)] = voltage
+        logging.warning(f"Simulated: Setting channel {channel} voltage to {voltage}")
+
+    async def get_channel_voltage_setpoint(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} voltage setpoint redout "
+            f"{self.channel_voltage_setpoint[conv_channel]}"
+        )
+        return self.channel_voltage_setpoint[conv_channel]
+
+    async def get_channel_voltage_actual(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} voltage redout "
+            f"{self.channel_voltage_setpoint[conv_channel]}"
+        )
+        return self.channel_voltage_setpoint[conv_channel]
+
+    async def set_channel_temperature(self, channel, temperature):
+        self.channel_temperature_setpoint[self.convert_channel(channel)] = temperature
+        logging.warning(
+            f"Simulated: Setting channel {channel} temperature to {temperature}"
+        )
+
+    async def get_channel_temperature_setpoint(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} temperature setpoint redout "
+            f"{self.channel_temperature_setpoint[conv_channel]}"
+        )
+        return self.channel_current_setpoint[conv_channel]
+
+    async def get_channel_temperature_actual(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} temperature redout "
+            f"{self.channel_temperature_setpoint[conv_channel]}"
+        )
+        return self.channel_temperature_setpoint[conv_channel]

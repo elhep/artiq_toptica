@@ -7,7 +7,8 @@ import sys
 from sipyco import common_args
 from sipyco.pc_rpc import simple_server_loop
 
-from artiq_toptica_dlcpro.driver import ArtiqTopticaDLCpro, ArtiqTopticaDLCproSim
+from artiq_toptica_dlcpro.driver import (ArtiqTopticaDLCpro,
+                                         ArtiqTopticaDLCproSim)
 
 
 def get_argparser():
