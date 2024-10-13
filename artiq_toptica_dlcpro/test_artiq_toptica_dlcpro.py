@@ -49,7 +49,7 @@ class GenericTopticaDLCproTest:
         )
 
 
-class TestTopticaDLCportSim(GenericRPCCase, GenericTopticaDLCproTest):
+class TestTopticaDLCproSim(GenericRPCCase, GenericTopticaDLCproTest):
     def setUp(self):
         GenericRPCCase.setUp(self)
         command = (
