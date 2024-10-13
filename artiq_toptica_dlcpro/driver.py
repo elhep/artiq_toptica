@@ -82,6 +82,9 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
             self.dlc.close()
 
     async def get_emission(self):
+        """
+        Read emission state.
+        """
         return self.dlc.emission.get()
 
     def get_laser(self, laser_number):
@@ -93,46 +96,79 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
             raise ValueError(f"Laser {laser_number} does not exist")
 
     async def get_channel_current_on(self, channel):
+        """
+        Read the state of the channel.
+        """
         laser = self.get_laser(channel)
         return laser.dl.cc.enabled.get()
 
     async def set_channel_current_on(self, channel, channel_on):
+        """
+        Change state of the channel.
+        """
         laser = self.get_laser(channel)
         laser.dl.cc.enabled.set(bool(channel_on))
 
     async def set_channel_current(self, channel, current):
+        """
+        Set current of the channel .
+        """
         laser = self.get_laser(channel)
         laser.dl.cc.current_set.set(current)
 
     async def get_channel_current_setpoint(self, channel):
+        """
+        Get current setpoint of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.cc.current_set.get()
 
     async def get_channel_current_actual(self, channel):
+        """
+        Get actual current value of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.cc.current_act.get()
 
     async def set_channel_voltage(self, channel, voltage):
+        """
+        Set voltage of the channel .
+        """
         laser = self.get_laser(channel)
         laser.dl.pc.voltage_set.set(voltage)
 
     async def get_channel_voltage_setpoint(self, channel):
+        """
+        Get voltage setpoint of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.pc.voltage_set.get()
 
     async def get_channel_voltage_actual(self, channel):
+        """
+        Get actual voltage value of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.pc.voltage_act.get()
 
     async def set_channel_temperature(self, channel, temperature):
+        """
+        Set temperature of the channel .
+        """
         laser = self.get_laser(channel)
         laser.dl.tc.temp_set.set(temperature)
 
     async def get_channel_temperature_setpoint(self, channel):
+        """
+        Get temperature setpoint of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.tc.temp_set.get()
 
     async def get_channel_temperature_actual(self, channel):
+        """
+        Get actual temperature value of the channel .
+        """
         laser = self.get_laser(channel)
         return laser.dl.tc.temp_act.get()
 
