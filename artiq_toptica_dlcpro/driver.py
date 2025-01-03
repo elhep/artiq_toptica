@@ -172,6 +172,13 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         return laser.dl.tc.temp_act.get()
 
+    async def ping(self):
+        health = self.dlc.system_health_txt.get()
+        if "OK" in health:
+            return True
+        else:
+            return False
+
     def close(self):
         self.close_connection()
 
