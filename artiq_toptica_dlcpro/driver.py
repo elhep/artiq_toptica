@@ -71,10 +71,6 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_laser_emission(self, channel):
-        pass
-
-    @abc.abstractmethod
     async def get_laser_lock_status(self, channel):
         pass
 
@@ -240,13 +236,6 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         falc = self.get_falc(falc_number)
         return falc.mon.config.get()
 
-    async def get_laser_emission(self, channel):
-        """
-        To track whether the laser emission is currently turned on or off.
-        """
-        laser = self.get_laser(channel)
-        return laser.emission.get()
-
     async def get_laser_lock_status(self, channel):
         """
         To see if the system is properly locked.
@@ -300,7 +289,6 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         self.falc_status = 2 * [0]
         self.falc_mon_config = 2 * [0]
 
-        self.laser_emission = 2 * [True]
         self.laser_lock_status = 2 * [0]
         self.cavity_temperature = 22.5
         self.amplifier_temperature = 2 * [26.0]
@@ -421,14 +409,6 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.falc_mon_config[conv_falc]}"
         )
         return self.falc_mon_config[conv_falc]
-
-    async def get_laser_emission(self, channel):
-        conv_channel = self.convert_channel(channel)
-        logging.warning(
-            f"Simulated: Laser {channel} emission redout "
-            f"{self.laser_emission[conv_channel]}"
-        )
-        return self.laser_emission[conv_channel]
 
     async def get_laser_lock_status(self, channel):
         conv_channel = self.convert_channel(channel)
