@@ -5,6 +5,7 @@ import asyncio
 import logging
 import random
 
+from toptica.lasersdk.client import Client
 from toptica.lasersdk.dlcpro.v2_2_0 import DLCpro, NetworkConnection
 
 
@@ -57,6 +58,38 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
     async def get_channel_temperature_actual(self, channel):
         pass
 
+    @abc.abstractmethod
+    async def get_falc_temperature(self, falc_number):
+        pass
+
+    @abc.abstractmethod
+    async def get_falc_status(self, falc_number):
+        pass
+
+    @abc.abstractmethod
+    async def get_falc_mon(self, falc_number):
+        pass
+
+    @abc.abstractmethod
+    async def get_laser_emission(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_laser_lock_status(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_cavity_temperature(self):
+        pass
+
+    @abc.abstractmethod
+    async def get_amplifier_temperature(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_amplifier_current(self, channel):
+        pass
+
     async def ping(self):
         return True
 
@@ -69,10 +102,13 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         """Initialize the controller with the device IP address."""
         self.device_ip = device_ip
         self.dlc = None
+        self.raw_client = None
         self.open_connection()
 
     def open_connection(self):
         """Open the connection to the DLC pro device."""
+        self.raw_client = Client(NetworkConnection(self.device_ip))
+        self.raw_client.open()
         self.dlc = DLCpro(NetworkConnection(self.device_ip))
         self.dlc.open()
 
@@ -80,6 +116,8 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         """Close the connection to the DLC pro device."""
         if self.dlc is not None:
             self.dlc.close()
+        if self.raw_client is not None:
+            self.raw_client.close()
 
     async def get_emission(self):
         """
@@ -94,6 +132,14 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
             return laser_instance
         else:
             raise ValueError(f"Laser {laser_number} does not exist")
+
+    def get_falc(self, falc_number):
+        falc_attr = f"falc{falc_number}"
+        falc_instance = getattr(self.dlc, falc_attr, None)
+        if falc_instance:
+            return falc_instance
+        else:
+            raise ValueError(f"Falc {falc_number} does not exist")
 
     async def get_channel_current_on(self, channel):
         """
@@ -172,6 +218,65 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         return laser.dl.tc.temp_act.get()
 
+    async def get_falc_temperature(self, falc_number):
+        """
+        Get the board temperature of a given Falc module.
+        """
+        falc = self.get_falc(falc_number)
+        return falc.board_temp.get()
+
+    async def get_falc_status(self, falc_number):
+        """
+        Get the status of a given Falc module.
+        """
+        falc = self.get_falc(falc_number)
+        return falc.status.get()
+
+    async def get_falc_mon(self, falc_number):
+        """
+        Get the monitor output configuration of a given Falc module.
+        Used to observe the signal on a spectrum analyzer.
+        """
+        falc = self.get_falc(falc_number)
+        return falc.mon.config.get()
+
+    async def get_laser_emission(self, channel):
+        """
+        To track whether the laser emission is currently turned on or off.
+        """
+        laser = self.get_laser(channel)
+        return laser.emission.get()
+
+    async def get_laser_lock_status(self, channel):
+        """
+        To see if the system is properly locked.
+        Alternative configurations depending on hardware/usage:
+        - laser.ctl.state.get()
+        - falc.status.get()
+        """
+        laser = self.get_laser(channel)
+        return laser.dl.pc.status.get()
+
+    async def get_cavity_temperature(self):
+        """
+        Get the cavity temperature (typically hf-cavity.tc2).
+        """
+        return self.raw_client.get('laser1:hf-cavity:tc2:temp-act')
+
+    async def get_amplifier_temperature(self, channel):
+        """
+        Get amplifier temperature.
+        """
+        laser = self.get_laser(channel)
+        return laser.amp.tc.temp_act.get()
+
+    async def get_amplifier_current(self, channel):
+        """
+        Get amplifier current.
+        """
+        laser = self.get_laser(channel)
+        return laser.amp.cc.current_act.get()
+
     async def ping(self):
         health = self.dlc.system_health_txt.get()
         if "OK" in health:
@@ -190,11 +295,28 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         self.channel_voltage_setpoint = 2 * [None]
         self.channel_temperature_setpoint = 2 * [None]
 
+        # New parameters initialization
+        self.falc_temperature = 2 * [25.0]
+        self.falc_status = 2 * [0]
+        self.falc_mon_config = 2 * [0]
+
+        self.laser_emission = 2 * [True]
+        self.laser_lock_status = 2 * [0]
+        self.cavity_temperature = 22.5
+        self.amplifier_temperature = 2 * [26.0]
+        self.amplifier_current = 2 * [100.0]
+
     def convert_channel(self, channel):
         conv_channel = channel - 1
         if conv_channel not in [0, 1]:
             raise ValueError("Channel out of range")
         return conv_channel
+
+    def convert_falc(self, falc_number):
+        conv_falc = falc_number - 1
+        if conv_falc not in [0, 1]:
+            raise ValueError("Falc number out of range")
+        return conv_falc
 
     async def get_emission(self):
         return True
@@ -275,3 +397,66 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.channel_temperature_setpoint[conv_channel]}"
         )
         return self.channel_temperature_setpoint[conv_channel]
+
+    async def get_falc_temperature(self, falc_number):
+        conv_falc = self.convert_falc(falc_number)
+        logging.warning(
+            f"Simulated: Falc {falc_number} board temperature redout "
+            f"{self.falc_temperature[conv_falc]}"
+        )
+        return self.falc_temperature[conv_falc]
+
+    async def get_falc_status(self, falc_number):
+        conv_falc = self.convert_falc(falc_number)
+        logging.warning(
+            f"Simulated: Falc {falc_number} status redout "
+            f"{self.falc_status[conv_falc]}"
+        )
+        return self.falc_status[conv_falc]
+
+    async def get_falc_mon(self, falc_number):
+        conv_falc = self.convert_falc(falc_number)
+        logging.warning(
+            f"Simulated: Falc {falc_number} monitor config redout "
+            f"{self.falc_mon_config[conv_falc]}"
+        )
+        return self.falc_mon_config[conv_falc]
+
+    async def get_laser_emission(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Laser {channel} emission redout "
+            f"{self.laser_emission[conv_channel]}"
+        )
+        return self.laser_emission[conv_channel]
+
+    async def get_laser_lock_status(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Laser {channel} lock status redout "
+            f"{self.laser_lock_status[conv_channel]}"
+        )
+        return self.laser_lock_status[conv_channel]
+
+    async def get_cavity_temperature(self):
+        logging.warning(
+            f"Simulated: Cavity temperature redout "
+            f"{self.cavity_temperature}"
+        )
+        return self.cavity_temperature
+
+    async def get_amplifier_temperature(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Laser {channel} amplifier temperature redout "
+            f"{self.amplifier_temperature[conv_channel]}"
+        )
+        return self.amplifier_temperature[conv_channel]
+
+    async def get_amplifier_current(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Laser {channel} amplifier current redout "
+            f"{self.amplifier_current[conv_channel]}"
+        )
+        return self.amplifier_current[conv_channel]

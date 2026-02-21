@@ -48,6 +48,22 @@ class GenericTopticaDLCproTest:
             self.artiq_toptica_dlcpro.get_channel_current_on(channel),
         )
 
+    def test_get_falc_parameters(self):
+        falc_num = 1
+        self.assertEqual(25.0, self.artiq_toptica_dlcpro.get_falc_temperature(falc_num))
+        self.assertEqual(0, self.artiq_toptica_dlcpro.get_falc_status(falc_num))
+        self.assertEqual(0, self.artiq_toptica_dlcpro.get_falc_mon(falc_num))
+
+    def test_get_laser_parameters(self):
+        channel = 1
+        self.assertEqual(True, self.artiq_toptica_dlcpro.get_laser_emission(channel))
+        self.assertEqual(0, self.artiq_toptica_dlcpro.get_laser_lock_status(channel))
+        self.assertEqual(26.0, self.artiq_toptica_dlcpro.get_amplifier_temperature(channel))
+        self.assertEqual(100.0, self.artiq_toptica_dlcpro.get_amplifier_current(channel))
+
+    def test_get_cavity_temperature(self):
+        self.assertEqual(22.5, self.artiq_toptica_dlcpro.get_cavity_temperature())
+
 
 class TestTopticaDLCproSim(GenericRPCCase, GenericTopticaDLCproTest):
     def setUp(self):
