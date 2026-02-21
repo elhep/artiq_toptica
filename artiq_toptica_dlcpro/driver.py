@@ -291,9 +291,9 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
 class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
     def __init__(self):
         self.channel_current_on = 2 * [False]
-        self.channel_current_setpoint = 2 * [None]
-        self.channel_voltage_setpoint = 2 * [None]
-        self.channel_temperature_setpoint = 2 * [None]
+        self.channel_current_setpoint = 2 * [0]
+        self.channel_voltage_setpoint = 2 * [0]
+        self.channel_temperature_setpoint = 2 * [0]
 
         # New parameters initialization
         self.falc_temperature = 2 * [25.0]
