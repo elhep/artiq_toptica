@@ -241,10 +241,13 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         To see if the system is properly locked.
         Alternative configurations depending on hardware/usage:
         - laser.ctl.state.get()
+        - laser.dl.lock.state.get()
+        - laser.pid1.state.get()
         - falc.status.get()
+        - laser.dl.pc.status.get()
         """
         laser = self.get_laser(channel)
-        return laser.dl.pc.status.get()
+        return laser.dl.lock.state.get()
 
     async def get_cavity_temperature(self):
         """
