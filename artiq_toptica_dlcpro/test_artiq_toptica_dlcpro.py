@@ -86,6 +86,54 @@ class GenericTopticaDLCproTest:
     def test_get_cavity_temperature(self):
         self.assertEqual(22.5, self.artiq_toptica_dlcpro.get_cavity_temperature())
 
+    def test_set_falc_parameters(self):
+        falc_num = 1
+
+        self.artiq_toptica_dlcpro.set_falc_input_gain_raw(falc_num, 1)
+        self.assertEqual(1, self.artiq_toptica_dlcpro.get_falc_input_gain_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_input_offset(falc_num, 1.2)
+        self.assertEqual(1.2, self.artiq_toptica_dlcpro.get_falc_input_offset(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_path_selection(falc_num, 2)
+        self.assertEqual(2, self.artiq_toptica_dlcpro.get_falc_path_selection(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_enabled(falc_num, False)
+        self.assertEqual(False, self.artiq_toptica_dlcpro.get_falc_main_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i1_raw(falc_num, 5)
+        self.assertEqual(5, self.artiq_toptica_dlcpro.get_falc_main_gain_i1_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i1_enabled(falc_num, False)
+        self.assertEqual(False, self.artiq_toptica_dlcpro.get_falc_main_gain_i1_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i2_raw(falc_num, 4)
+        self.assertEqual(4, self.artiq_toptica_dlcpro.get_falc_main_gain_i2_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i2_enabled(falc_num, False)
+        self.assertEqual(False, self.artiq_toptica_dlcpro.get_falc_main_gain_i2_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i3_raw(falc_num, 3)
+        self.assertEqual(3, self.artiq_toptica_dlcpro.get_falc_main_gain_i3_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_i3_enabled(falc_num, True)
+        self.assertEqual(True, self.artiq_toptica_dlcpro.get_falc_main_gain_i3_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_d1_raw(falc_num, 8)
+        self.assertEqual(8, self.artiq_toptica_dlcpro.get_falc_main_gain_d1_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_d1_enabled(falc_num, False)
+        self.assertEqual(False, self.artiq_toptica_dlcpro.get_falc_main_gain_d1_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_d2_raw(falc_num, 5)
+        self.assertEqual(5, self.artiq_toptica_dlcpro.get_falc_main_gain_d2_raw(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain_d2_enabled(falc_num, False)
+        self.assertEqual(False, self.artiq_toptica_dlcpro.get_falc_main_gain_d2_enabled(falc_num))
+
+        self.artiq_toptica_dlcpro.set_falc_main_gain(falc_num, -4.5)
+        self.assertEqual(-4.5, self.artiq_toptica_dlcpro.get_falc_main_gain(falc_num))
+
 
 class TestTopticaDLCproSim(GenericRPCCase, GenericTopticaDLCproTest):
     def setUp(self):
