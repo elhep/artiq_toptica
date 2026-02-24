@@ -52,7 +52,6 @@ class GenericTopticaDLCproTest:
         falc_num = 1
         self.assertEqual(25.0, self.artiq_toptica_dlcpro.get_falc_temperature(falc_num))
         self.assertEqual(0, self.artiq_toptica_dlcpro.get_falc_status(falc_num))
-        self.assertEqual(0, self.artiq_toptica_dlcpro.get_falc_mon(falc_num))
 
     def test_get_laser_parameters(self):
         channel = 1

@@ -67,10 +67,6 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def get_falc_mon(self, falc_number):
-        pass
-
-    @abc.abstractmethod
     async def get_laser_lock_status(self, channel):
         pass
 
@@ -228,14 +224,6 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         falc = self.get_falc(falc_number)
         return falc.status.get()
 
-    async def get_falc_mon(self, falc_number):
-        """
-        Get the monitor output configuration of a given Falc module.
-        Used to observe the signal on a spectrum analyzer.
-        """
-        falc = self.get_falc(falc_number)
-        return falc.mon.config.get()
-
     async def get_laser_lock_status(self, channel):
         """
         To see if the system is properly locked.
@@ -290,7 +278,6 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         # New parameters initialization
         self.falc_temperature = 2 * [25.0]
         self.falc_status = 2 * [0]
-        self.falc_mon_config = 2 * [0]
 
         self.laser_lock_status = 2 * [0]
         self.cavity_temperature = 22.5
@@ -404,14 +391,6 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.falc_status[conv_falc]}"
         )
         return self.falc_status[conv_falc]
-
-    async def get_falc_mon(self, falc_number):
-        conv_falc = self.convert_falc(falc_number)
-        logging.warning(
-            f"Simulated: Falc {falc_number} monitor config redout "
-            f"{self.falc_mon_config[conv_falc]}"
-        )
-        return self.falc_mon_config[conv_falc]
 
     async def get_laser_lock_status(self, channel):
         conv_channel = self.convert_channel(channel)
