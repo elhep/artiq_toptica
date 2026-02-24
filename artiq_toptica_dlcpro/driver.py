@@ -628,7 +628,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         - laser.dl.pc.status.get()
         """
         laser = self.get_laser(channel)
-        return laser.dl.lock.state.get()
+        return laser.dl.lock.lock_enabled.get()
 
     async def get_cavity_temperature(self):
         """
