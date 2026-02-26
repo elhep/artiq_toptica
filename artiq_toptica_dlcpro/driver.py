@@ -23,7 +23,7 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def set_channel_current(self, channel, current):
+    async def set_channel_current_setpoint(self, channel, current):
         pass
 
     @abc.abstractmethod
@@ -35,7 +35,7 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def set_channel_voltage(self, channel, voltage):
+    async def set_channel_voltage_setpoint(self, channel, voltage):
         pass
 
     @abc.abstractmethod
@@ -47,7 +47,7 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
-    async def set_channel_temperature(self, channel, temperature):
+    async def set_channel_temperature_setpoint(self, channel, temperature):
         pass
 
     @abc.abstractmethod
@@ -287,7 +287,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         laser.dl.cc.enabled.set(bool(channel_on))
 
-    async def set_channel_current(self, channel, current):
+    async def set_channel_current_setpoint(self, channel, current):
         """
         Set current of the channel .
         """
@@ -308,7 +308,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         return laser.dl.cc.current_act.get()
 
-    async def set_channel_voltage(self, channel, voltage):
+    async def set_channel_voltage_setpoint(self, channel, voltage):
         """
         Set voltage of the channel .
         """
@@ -329,7 +329,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         return laser.dl.pc.voltage_act.get()
 
-    async def set_channel_temperature(self, channel, temperature):
+    async def set_channel_temperature_setpoint(self, channel, temperature):
         """
         Set temperature of the channel .
         """
@@ -724,7 +724,7 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         else:
             logging.warning(f"Simulated: Turning channel {channel } OFF")
 
-    async def set_channel_current(self, channel, current):
+    async def set_channel_current_setpoint(self, channel, current):
         self.channel_current_setpoint[self.convert_channel(channel)] = current
         logging.warning(f"Simulated: Setting channel {channel} current to {current}")
 
@@ -744,7 +744,7 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         )
         return self.channel_current_setpoint[conv_channel]
 
-    async def set_channel_voltage(self, channel, voltage):
+    async def set_channel_voltage_setpoint(self, channel, voltage):
         self.channel_voltage_setpoint[self.convert_channel(channel)] = voltage
         logging.warning(f"Simulated: Setting channel {channel} voltage to {voltage}")
 
@@ -764,7 +764,7 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         )
         return self.channel_voltage_setpoint[conv_channel]
 
-    async def set_channel_temperature(self, channel, temperature):
+    async def set_channel_temperature_setpoint(self, channel, temperature):
         self.channel_temperature_setpoint[self.convert_channel(channel)] = temperature
         logging.warning(
             f"Simulated: Setting channel {channel} temperature to {temperature}"

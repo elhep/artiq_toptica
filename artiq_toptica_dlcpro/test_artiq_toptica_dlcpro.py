@@ -4,10 +4,10 @@ from sipyco.test.generic_rpc import GenericRPCCase
 
 
 class GenericTopticaDLCproTest:
-    def test_set_channel_temperature(self):
+    def test_set_channel_temperature_setpoint(self):
         temperature = 5e6
         channel = 1
-        self.artiq_toptica_dlcpro.set_channel_temperature(channel, temperature)
+        self.artiq_toptica_dlcpro.set_channel_temperature_setpoint(channel, temperature)
         self.assertEqual(
             temperature,
             self.artiq_toptica_dlcpro.get_channel_temperature_setpoint(channel),
@@ -17,10 +17,10 @@ class GenericTopticaDLCproTest:
             self.artiq_toptica_dlcpro.get_channel_temperature_actual(channel),
         )
 
-    def test_set_channel_voltage(self):
+    def test_set_channel_voltage_setpoint(self):
         voltage = 5e6
         channel = 1
-        self.artiq_toptica_dlcpro.set_channel_voltage(channel, voltage)
+        self.artiq_toptica_dlcpro.set_channel_voltage_setpoint(channel, voltage)
         self.assertEqual(
             voltage, self.artiq_toptica_dlcpro.get_channel_voltage_setpoint(channel)
         )
@@ -28,10 +28,10 @@ class GenericTopticaDLCproTest:
             voltage, self.artiq_toptica_dlcpro.get_channel_voltage_actual(channel)
         )
 
-    def test_set_channel_current(self):
+    def test_set_channel_current_setpoint(self):
         current = 3e6
         channel = 2
-        self.artiq_toptica_dlcpro.set_channel_current(channel, current)
+        self.artiq_toptica_dlcpro.set_channel_current_setpoint(channel, current)
         self.assertEqual(
             current, self.artiq_toptica_dlcpro.get_channel_current_setpoint(channel)
         )
