@@ -51,6 +51,19 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def get_channel_eom_voltage_actual(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_eom_voltage_setpoint(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_eom_voltage_setpoint(self, channel, voltage):
+        pass
+
+
+    @abc.abstractmethod
     async def set_channel_temperature_setpoint(self, channel, temperature):
         pass
 
@@ -339,6 +352,26 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         """
         laser = self.get_laser(channel)
         return laser.dl.pc.voltage_act.get()
+
+    async def get_channel_eom_voltage_actual(self, channel):
+        """
+        Get actual EOM voltage value of the channel.
+        Because the eom attribute is missing from the toptica Python SDK
+        laser.dl object, we must use the raw_client.
+        """
+        return self.raw_client.get(f"laser{channel}:dl:eom:voltage-act")
+
+    async def get_channel_eom_voltage_setpoint(self, channel):
+        """
+        Get EOM voltage setpoint of the channel.
+        """
+        return self.raw_client.get(f"laser{channel}:dl:eom:voltage-set")
+
+    async def set_channel_eom_voltage_setpoint(self, channel, voltage):
+        """
+        Set EOM voltage of the channel.
+        """
+        self.raw_client.set(f"laser{channel}:dl:eom:voltage-set", voltage)
 
     async def set_channel_temperature_setpoint(self, channel, temperature):
         """
@@ -678,6 +711,7 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         self.channel_current_setpoint = 2 * [0]
         self.channel_voltage_setpoint = 2 * [0]
         self.channel_temperature_setpoint = 2 * [0]
+        self.channel_eom_voltage_setpoint = 2 * [0.0]
 
         # New parameters initialization
         self.falc_temperature = 2 * [25.0]
@@ -781,6 +815,26 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.channel_voltage_setpoint[conv_channel]}"
         )
         return self.channel_voltage_setpoint[conv_channel]
+
+    async def get_channel_eom_voltage_actual(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} EOM voltage redout "
+            f"{self.channel_eom_voltage_setpoint[conv_channel]}"
+        )
+        return self.channel_eom_voltage_setpoint[conv_channel]
+
+    async def set_channel_eom_voltage_setpoint(self, channel, voltage):
+        self.channel_eom_voltage_setpoint[self.convert_channel(channel)] = voltage
+        logging.warning(f"Simulated: Setting channel {channel} EOM voltage to {voltage}")
+
+    async def get_channel_eom_voltage_setpoint(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} EOM voltage setpoint redout "
+            f"{self.channel_eom_voltage_setpoint[conv_channel]}"
+        )
+        return self.channel_eom_voltage_setpoint[conv_channel]
 
     async def set_channel_temperature_setpoint(self, channel, temperature):
         self.channel_temperature_setpoint[self.convert_channel(channel)] = temperature

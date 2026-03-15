@@ -27,6 +27,20 @@ class GenericTopticaDLCproTest:
         self.assertEqual(
             voltage, self.artiq_toptica_dlcpro.get_channel_voltage_actual(channel)
         )
+        self.assertEqual(
+            0.0, self.artiq_toptica_dlcpro.get_channel_eom_voltage_actual(channel)
+        )
+
+    def test_set_channel_eom_voltage_setpoint(self):
+        voltage = 10.5
+        channel = 1
+        self.artiq_toptica_dlcpro.set_channel_eom_voltage_setpoint(channel, voltage)
+        self.assertEqual(
+            voltage, self.artiq_toptica_dlcpro.get_channel_eom_voltage_setpoint(channel)
+        )
+        self.assertEqual(
+            voltage, self.artiq_toptica_dlcpro.get_channel_eom_voltage_actual(channel)
+        )
 
     def test_set_channel_current_setpoint(self):
         current = 3e6
