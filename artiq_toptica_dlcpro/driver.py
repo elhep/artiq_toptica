@@ -62,6 +62,32 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
     async def set_channel_eom_voltage_setpoint(self, channel, voltage):
         pass
 
+    @abc.abstractmethod
+    async def get_channel_scan_enabled(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_scan_enabled(self, channel, enabled):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_scan_amplitude(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_scan_amplitude(self, channel, amplitude):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_scan_offset(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_scan_offset(self, channel, offset):
+        pass
+
+
+
 
     @abc.abstractmethod
     async def set_channel_temperature_setpoint(self, channel, temperature):
@@ -372,6 +398,48 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Set EOM voltage of the channel.
         """
         self.raw_client.set(f"laser{channel}:dl:eom:voltage-set", voltage)
+
+    async def get_channel_scan_enabled(self, channel):
+        """
+        Get scan enabled status of the channel.
+        """
+        laser = self.get_laser(channel)
+        return laser.scan.enabled.get()
+
+    async def set_channel_scan_enabled(self, channel, enabled):
+        """
+        Set scan enabled status of the channel.
+        """
+        laser = self.get_laser(channel)
+        laser.scan.enabled.set(bool(enabled))
+
+    async def get_channel_scan_amplitude(self, channel):
+        """
+        Get scan amplitude of the channel.
+        """
+        laser = self.get_laser(channel)
+        return laser.scan.amplitude.get()
+
+    async def set_channel_scan_amplitude(self, channel, amplitude):
+        """
+        Set scan amplitude of the channel.
+        """
+        laser = self.get_laser(channel)
+        laser.scan.amplitude.set(amplitude)
+
+    async def get_channel_scan_offset(self, channel):
+        """
+        Get scan offset of the channel.
+        """
+        laser = self.get_laser(channel)
+        return laser.scan.offset.get()
+
+    async def set_channel_scan_offset(self, channel, offset):
+        """
+        Set scan offset of the channel.
+        """
+        laser = self.get_laser(channel)
+        laser.scan.offset.set(offset)
 
     async def set_channel_temperature_setpoint(self, channel, temperature):
         """
@@ -712,6 +780,9 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         self.channel_voltage_setpoint = 2 * [0]
         self.channel_temperature_setpoint = 2 * [0]
         self.channel_eom_voltage_setpoint = 2 * [0.0]
+        self.channel_scan_enabled = 2 * [False]
+        self.channel_scan_amplitude = 2 * [0.0]
+        self.channel_scan_offset = 2 * [0.0]
 
         # New parameters initialization
         self.falc_temperature = 2 * [25.0]
@@ -835,6 +906,42 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.channel_eom_voltage_setpoint[conv_channel]}"
         )
         return self.channel_eom_voltage_setpoint[conv_channel]
+
+    async def get_channel_scan_enabled(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} scan enabled redout "
+            f"{self.channel_scan_enabled[conv_channel]}"
+        )
+        return self.channel_scan_enabled[conv_channel]
+
+    async def set_channel_scan_enabled(self, channel, enabled):
+        self.channel_scan_enabled[self.convert_channel(channel)] = enabled
+        logging.warning(f"Simulated: Setting channel {channel} scan enabled to {enabled}")
+
+    async def get_channel_scan_amplitude(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} scan amplitude redout "
+            f"{self.channel_scan_amplitude[conv_channel]}"
+        )
+        return self.channel_scan_amplitude[conv_channel]
+
+    async def set_channel_scan_amplitude(self, channel, amplitude):
+        self.channel_scan_amplitude[self.convert_channel(channel)] = amplitude
+        logging.warning(f"Simulated: Setting channel {channel} scan amplitude to {amplitude}")
+
+    async def get_channel_scan_offset(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} scan offset redout "
+            f"{self.channel_scan_offset[conv_channel]}"
+        )
+        return self.channel_scan_offset[conv_channel]
+
+    async def set_channel_scan_offset(self, channel, offset):
+        self.channel_scan_offset[self.convert_channel(channel)] = offset
+        logging.warning(f"Simulated: Setting channel {channel} scan offset to {offset}")
 
     async def set_channel_temperature_setpoint(self, channel, temperature):
         self.channel_temperature_setpoint[self.convert_channel(channel)] = temperature

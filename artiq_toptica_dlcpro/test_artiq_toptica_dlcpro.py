@@ -42,6 +42,25 @@ class GenericTopticaDLCproTest:
             voltage, self.artiq_toptica_dlcpro.get_channel_eom_voltage_actual(channel)
         )
 
+    def test_set_channel_scan_options(self):
+        channel = 1
+        self.artiq_toptica_dlcpro.set_channel_scan_enabled(channel, True)
+        self.assertEqual(
+            True, self.artiq_toptica_dlcpro.get_channel_scan_enabled(channel)
+        )
+
+        amplitude = 2.5
+        self.artiq_toptica_dlcpro.set_channel_scan_amplitude(channel, amplitude)
+        self.assertEqual(
+            amplitude, self.artiq_toptica_dlcpro.get_channel_scan_amplitude(channel)
+        )
+
+        offset = 1.2
+        self.artiq_toptica_dlcpro.set_channel_scan_offset(channel, offset)
+        self.assertEqual(
+            offset, self.artiq_toptica_dlcpro.get_channel_scan_offset(channel)
+        )
+
     def test_set_channel_current_setpoint(self):
         current = 3e6
         channel = 2
