@@ -79,6 +79,7 @@ class GenericTopticaDLCproTest:
     def test_get_laser_parameters(self):
         channel = 1
         self.assertEqual(True, self.artiq_toptica_dlcpro.get_emission())
+        self.assertEqual(True, self.artiq_toptica_dlcpro.get_channel_emission(channel))
         self.assertEqual(0, self.artiq_toptica_dlcpro.get_laser_lock_status(channel))
         self.assertEqual(26.0, self.artiq_toptica_dlcpro.get_amplifier_temperature(channel))
         self.assertEqual(100.0, self.artiq_toptica_dlcpro.get_amplifier_current(channel))

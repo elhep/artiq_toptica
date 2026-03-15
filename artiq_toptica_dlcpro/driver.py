@@ -15,6 +15,10 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
         pass
 
     @abc.abstractmethod
+    async def get_channel_emission(self, channel):
+        pass
+
+    @abc.abstractmethod
     async def get_channel_current_on(self, channel):
         pass
 
@@ -256,6 +260,13 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Read emission state.
         """
         return self.dlc.emission.get()
+
+    async def get_channel_emission(self, channel):
+        """
+        Read channel emission state.
+        """
+        laser = self.get_laser(channel)
+        return laser.emission.get()
 
     def get_laser(self, laser_number):
         laser_attr = f"laser{laser_number}"
@@ -707,6 +718,13 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         return conv_falc
 
     async def get_emission(self):
+        return True
+
+    async def get_channel_emission(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} emission redout True"
+        )
         return True
 
     async def get_channel_current_on(self, channel):
