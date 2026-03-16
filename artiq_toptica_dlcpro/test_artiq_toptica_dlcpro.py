@@ -68,6 +68,9 @@ class GenericTopticaDLCproTest:
         self.assertEqual(
             output_channel, self.artiq_toptica_dlcpro.get_channel_wide_scan_output_channel(channel)
         )
+        self.assertEqual(
+            "Fast In 3", self.artiq_toptica_dlcpro.get_channel_wide_scan_output_channel_name(channel)
+        )
 
         value_set = 10.5
         self.artiq_toptica_dlcpro.set_channel_wide_scan_value_set(channel, value_set)

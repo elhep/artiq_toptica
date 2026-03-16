@@ -10,6 +10,70 @@ from toptica.lasersdk.dlcpro.v2_2_0 import DLCpro, NetworkConnection
 
 
 class ArtiqTopticaDLCproInterface(abc.ABC):
+    SIGNAL_CHANNEL_NAMES = {
+        -3: "none",
+        -2: "Time",
+        -1: "Frequency",
+        0: "Fine In 1",
+        1: "Fine In 2",
+        2: "Fast In 3",
+        4: "Fast In 4",
+        20: "Output A",
+        21: "Output B",
+        30: "Lock-In Out",
+        31: "PID 1 Out",
+        32: "PID 2 Out",
+        34: "Scan Output",
+        35: "Aux Scan Output",
+        40: "PDH Error 1",
+        41: "PDH In 1",
+        42: "PDH Error 2",
+        43: "PDH In 2",
+        50: "Piezo Voltage",
+        51: "CC Current, Laser Current",
+        52: "CC AIn A",
+        53: "CC AIn B",
+        54: "Laser PD, Monitor Photo Diode",
+        55: "PD EXT, user calibrated laser power",
+        56: "Laser Set Temperature",
+        57: "Laser Actual Temperature",
+        58: "EOM Voltage",
+        60: "AMPCC AIn",
+        61: "Seed Power",
+        62: "Amplifier Power",
+        63: "Amplifier Current",
+        69: "CTL Laser Photodiode",
+        70: "CTL Laser Power",
+        78: "CTL Set Wavelength",
+        79: "CTL Actual Wavelength",
+        80: "SHG Cavity Error Signal",
+        81: "SHG Cavity Rejection Signal",
+        82: "SHG Intra-Cavity Signal",
+        83: "SHG Power",
+        84: "Amplifier Power",
+        85: "Seed Power",
+        86: "Fiber Power",
+        87: "SHG Input Power",
+        90: "SHG Cavity Piezo Voltage Slow",
+        91: "SHG Cavity Piezo Voltage Fast",
+        100: "Lock Input",
+        101: "Scan Output Channel",
+        102: "PowerLock Input",
+        103: "Aux Scan Output Channel",
+        110: "FHG Cavity Error Signal",
+        111: "FHG Cavity Rejection Signal",
+        112: "FHG Intra-Cavity Signal",
+        113: "FHG Power",
+        120: "FHG Cavity Piezo Voltage Slow",
+        121: "FHG Cavity Piezo Voltage Fast",
+        144: "OPO Pump Power",
+        145: "OPO Depleted Pump Power",
+        146: "OPO Signal Power",
+        147: "OPO Idler Power",
+        150: "OPO Cavity Piezo Voltage Slow",
+        151: "OPO Cavity Piezo Voltage Fast",
+    }
+
     @abc.abstractmethod
     async def get_emission(self):
         pass
@@ -88,6 +152,10 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
 
     @abc.abstractmethod
     async def get_channel_wide_scan_output_channel(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_output_channel_name(self, channel):
         pass
 
     @abc.abstractmethod
@@ -491,6 +559,13 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         """
         laser = self.get_laser(channel)
         return laser.wide_scan.output_channel.get()
+
+    async def get_channel_wide_scan_output_channel_name(self, channel):
+        """
+        Get wide scan output channel name via translation from Signal Channel IDs.
+        """
+        ch = await self.get_channel_wide_scan_output_channel(channel)
+        return self.SIGNAL_CHANNEL_NAMES.get(ch, f"Unknown Output Channel {ch}")
 
     async def set_channel_wide_scan_output_channel(self, channel, output_channel):
         """
@@ -1076,6 +1151,16 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
             f"{self.channel_wide_scan_output_channel[conv_channel]}"
         )
         return self.channel_wide_scan_output_channel[conv_channel]
+
+    async def get_channel_wide_scan_output_channel_name(self, channel):
+        conv_channel = self.convert_channel(channel)
+        ch_num = self.channel_wide_scan_output_channel[conv_channel]
+        name = self.SIGNAL_CHANNEL_NAMES.get(ch_num, f"Unknown Output Channel {ch_num}")
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan output channel name redout "
+            f"{name}"
+        )
+        return name
 
     async def set_channel_wide_scan_output_channel(self, channel, output_channel):
         self.channel_wide_scan_output_channel[self.convert_channel(channel)] = output_channel
