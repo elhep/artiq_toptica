@@ -61,6 +61,41 @@ class GenericTopticaDLCproTest:
             offset, self.artiq_toptica_dlcpro.get_channel_scan_offset(channel)
         )
 
+    def test_set_channel_wide_scan_options(self):
+        channel = 1
+        output_channel = 2
+        self.artiq_toptica_dlcpro.set_channel_wide_scan_output_channel(channel, output_channel)
+        self.assertEqual(
+            output_channel, self.artiq_toptica_dlcpro.get_channel_wide_scan_output_channel(channel)
+        )
+
+        value_set = 10.5
+        self.artiq_toptica_dlcpro.set_channel_wide_scan_value_set(channel, value_set)
+        self.assertEqual(
+            value_set, self.artiq_toptica_dlcpro.get_channel_wide_scan_value_set(channel)
+        )
+        self.assertEqual(
+            value_set, self.artiq_toptica_dlcpro.get_channel_wide_scan_value_act(channel)
+        )
+
+        scan_begin = -15.0
+        self.artiq_toptica_dlcpro.set_channel_wide_scan_scan_begin(channel, scan_begin)
+        self.assertEqual(
+            scan_begin, self.artiq_toptica_dlcpro.get_channel_wide_scan_scan_begin(channel)
+        )
+
+        scan_end = 20.0
+        self.artiq_toptica_dlcpro.set_channel_wide_scan_scan_end(channel, scan_end)
+        self.assertEqual(
+            scan_end, self.artiq_toptica_dlcpro.get_channel_wide_scan_scan_end(channel)
+        )
+
+        duration = 5.5
+        self.artiq_toptica_dlcpro.set_channel_wide_scan_duration(channel, duration)
+        self.assertEqual(
+            duration, self.artiq_toptica_dlcpro.get_channel_wide_scan_duration(channel)
+        )
+
     def test_set_channel_current_setpoint(self):
         current = 3e6
         channel = 2

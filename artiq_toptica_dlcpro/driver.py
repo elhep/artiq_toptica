@@ -86,6 +86,50 @@ class ArtiqTopticaDLCproInterface(abc.ABC):
     async def set_channel_scan_offset(self, channel, offset):
         pass
 
+    @abc.abstractmethod
+    async def get_channel_wide_scan_output_channel(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_wide_scan_output_channel(self, channel, output_channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_value_set(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_wide_scan_value_set(self, channel, value):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_value_act(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_scan_begin(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_wide_scan_scan_begin(self, channel, scan_begin):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_scan_end(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_wide_scan_scan_end(self, channel, scan_end):
+        pass
+
+    @abc.abstractmethod
+    async def get_channel_wide_scan_duration(self, channel):
+        pass
+
+    @abc.abstractmethod
+    async def set_channel_wide_scan_duration(self, channel, duration):
+        pass
+
 
 
 
@@ -441,6 +485,83 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         laser = self.get_laser(channel)
         laser.scan.offset.set(offset)
 
+    async def get_channel_wide_scan_output_channel(self, channel):
+        """
+        Get wide scan output channel.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.output_channel.get()
+
+    async def set_channel_wide_scan_output_channel(self, channel, output_channel):
+        """
+        Set wide scan output channel.
+        """
+        laser = self.get_laser(channel)
+        laser.wide_scan.output_channel.set(output_channel)
+
+    async def get_channel_wide_scan_value_set(self, channel):
+        """
+        Get wide scan value set.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.value_set.get()
+
+    async def set_channel_wide_scan_value_set(self, channel, value):
+        """
+        Set wide scan value set.
+        """
+        laser = self.get_laser(channel)
+        laser.wide_scan.value_set.set(value)
+
+    async def get_channel_wide_scan_value_act(self, channel):
+        """
+        Get wide scan value actual.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.value_act.get()
+
+    async def get_channel_wide_scan_scan_begin(self, channel):
+        """
+        Get wide scan start value.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.scan_begin.get()
+
+    async def set_channel_wide_scan_scan_begin(self, channel, scan_begin):
+        """
+        Set wide scan start value.
+        """
+        laser = self.get_laser(channel)
+        laser.wide_scan.scan_begin.set(scan_begin)
+
+    async def get_channel_wide_scan_scan_end(self, channel):
+        """
+        Get wide scan end value.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.scan_end.get()
+
+    async def set_channel_wide_scan_scan_end(self, channel, scan_end):
+        """
+        Set wide scan end value.
+        """
+        laser = self.get_laser(channel)
+        laser.wide_scan.scan_end.set(scan_end)
+
+    async def get_channel_wide_scan_duration(self, channel):
+        """
+        Get wide scan duration.
+        """
+        laser = self.get_laser(channel)
+        return laser.wide_scan.duration.get()
+
+    async def set_channel_wide_scan_duration(self, channel, duration):
+        """
+        Set wide scan duration.
+        """
+        laser = self.get_laser(channel)
+        laser.wide_scan.duration.set(duration)
+
     async def set_channel_temperature_setpoint(self, channel, temperature):
         """
         Set temperature of the channel .
@@ -783,6 +904,11 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
         self.channel_scan_enabled = 2 * [False]
         self.channel_scan_amplitude = 2 * [0.0]
         self.channel_scan_offset = 2 * [0.0]
+        self.channel_wide_scan_output_channel = 2 * [1]
+        self.channel_wide_scan_value_set = 2 * [0.0]
+        self.channel_wide_scan_scan_begin = 2 * [0.0]
+        self.channel_wide_scan_scan_end = 2 * [0.0]
+        self.channel_wide_scan_duration = 2 * [10.0]
 
         # New parameters initialization
         self.falc_temperature = 2 * [25.0]
@@ -942,6 +1068,74 @@ class ArtiqTopticaDLCproSim(ArtiqTopticaDLCproInterface):
     async def set_channel_scan_offset(self, channel, offset):
         self.channel_scan_offset[self.convert_channel(channel)] = offset
         logging.warning(f"Simulated: Setting channel {channel} scan offset to {offset}")
+
+    async def get_channel_wide_scan_output_channel(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan output channel redout "
+            f"{self.channel_wide_scan_output_channel[conv_channel]}"
+        )
+        return self.channel_wide_scan_output_channel[conv_channel]
+
+    async def set_channel_wide_scan_output_channel(self, channel, output_channel):
+        self.channel_wide_scan_output_channel[self.convert_channel(channel)] = output_channel
+        logging.warning(f"Simulated: Setting channel {channel} wide scan output channel to {output_channel}")
+
+    async def get_channel_wide_scan_value_set(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan value set redout "
+            f"{self.channel_wide_scan_value_set[conv_channel]}"
+        )
+        return self.channel_wide_scan_value_set[conv_channel]
+
+    async def set_channel_wide_scan_value_set(self, channel, value):
+        self.channel_wide_scan_value_set[self.convert_channel(channel)] = value
+        logging.warning(f"Simulated: Setting channel {channel} wide scan value set to {value}")
+
+    async def get_channel_wide_scan_value_act(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan value act redout "
+            f"{self.channel_wide_scan_value_set[conv_channel]}"
+        )
+        return self.channel_wide_scan_value_set[conv_channel]
+
+    async def get_channel_wide_scan_scan_begin(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan start redout "
+            f"{self.channel_wide_scan_scan_begin[conv_channel]}"
+        )
+        return self.channel_wide_scan_scan_begin[conv_channel]
+
+    async def set_channel_wide_scan_scan_begin(self, channel, scan_begin):
+        self.channel_wide_scan_scan_begin[self.convert_channel(channel)] = scan_begin
+        logging.warning(f"Simulated: Setting channel {channel} wide scan start to {scan_begin}")
+
+    async def get_channel_wide_scan_scan_end(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan end redout "
+            f"{self.channel_wide_scan_scan_end[conv_channel]}"
+        )
+        return self.channel_wide_scan_scan_end[conv_channel]
+
+    async def set_channel_wide_scan_scan_end(self, channel, scan_end):
+        self.channel_wide_scan_scan_end[self.convert_channel(channel)] = scan_end
+        logging.warning(f"Simulated: Setting channel {channel} wide scan end to {scan_end}")
+
+    async def get_channel_wide_scan_duration(self, channel):
+        conv_channel = self.convert_channel(channel)
+        logging.warning(
+            f"Simulated: Channel {channel} wide scan duration redout "
+            f"{self.channel_wide_scan_duration[conv_channel]}"
+        )
+        return self.channel_wide_scan_duration[conv_channel]
+
+    async def set_channel_wide_scan_duration(self, channel, duration):
+        self.channel_wide_scan_duration[self.convert_channel(channel)] = duration
+        logging.warning(f"Simulated: Setting channel {channel} wide scan duration to {duration}")
 
     async def set_channel_temperature_setpoint(self, channel, temperature):
         self.channel_temperature_setpoint[self.convert_channel(channel)] = temperature
