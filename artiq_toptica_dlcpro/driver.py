@@ -454,21 +454,21 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Set current of the channel .
         """
         laser = self.get_laser(channel)
-        laser.dl.cc.current_set.set(current)
+        laser.dl.cc.current_set.set(current * 1000.0)
 
     async def get_channel_current_setpoint(self, channel):
         """
         Get current setpoint of the channel .
         """
         laser = self.get_laser(channel)
-        return laser.dl.cc.current_set.get()
+        return laser.dl.cc.current_set.get() / 1000.0
 
     async def get_channel_current_actual(self, channel):
         """
         Get actual current value of the channel .
         """
         laser = self.get_laser(channel)
-        return laser.dl.cc.current_act.get()
+        return laser.dl.cc.current_act.get() / 1000.0
 
     async def set_channel_voltage_setpoint(self, channel, voltage):
         """
@@ -579,13 +579,20 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Get wide scan value set.
         """
         laser = self.get_laser(channel)
-        return laser.wide_scan.value_set.get()
+        value = laser.wide_scan.value_set.get()
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            return value / 1000.0
+        return value
 
     async def set_channel_wide_scan_value_set(self, channel, value):
         """
         Set wide scan value set.
         """
         laser = self.get_laser(channel)
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            value = value * 1000.0
         laser.wide_scan.value_set.set(value)
 
     async def get_channel_wide_scan_value_act(self, channel):
@@ -593,20 +600,31 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Get wide scan value actual.
         """
         laser = self.get_laser(channel)
-        return laser.wide_scan.value_act.get()
+        value = laser.wide_scan.value_act.get()
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            return value / 1000.0
+        return value
 
     async def get_channel_wide_scan_scan_begin(self, channel):
         """
         Get wide scan start value.
         """
         laser = self.get_laser(channel)
-        return laser.wide_scan.scan_begin.get()
+        value = laser.wide_scan.scan_begin.get()
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            return value / 1000.0
+        return value
 
     async def set_channel_wide_scan_scan_begin(self, channel, scan_begin):
         """
         Set wide scan start value.
         """
         laser = self.get_laser(channel)
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            scan_begin = scan_begin * 1000.0
         laser.wide_scan.scan_begin.set(scan_begin)
 
     async def get_channel_wide_scan_scan_end(self, channel):
@@ -614,13 +632,20 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Get wide scan end value.
         """
         laser = self.get_laser(channel)
-        return laser.wide_scan.scan_end.get()
+        value = laser.wide_scan.scan_end.get()
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            return value / 1000.0
+        return value
 
     async def set_channel_wide_scan_scan_end(self, channel, scan_end):
         """
         Set wide scan end value.
         """
         laser = self.get_laser(channel)
+        output_channel = await self.get_channel_wide_scan_output_channel(channel)
+        if output_channel in (51, 63):
+            scan_end = scan_end * 1000.0
         laser.wide_scan.scan_end.set(scan_end)
 
     async def get_channel_wide_scan_duration(self, channel):
@@ -956,7 +981,7 @@ class ArtiqTopticaDLCpro(ArtiqTopticaDLCproInterface):
         Get amplifier current.
         """
         laser = self.get_laser(channel)
-        return laser.amp.cc.current_act.get()
+        return laser.amp.cc.current_act.get() / 1000.0
 
     async def ping(self):
         health = self.dlc.system_health_txt.get()
