@@ -12,8 +12,9 @@ First, run the Toptica DLCpro controller::
 Then, send commands to it via the ``sipyco_rpctool`` utility::
 
     $ sipyco_rpctool 127.0.0.1 3282 call set_channel_current_on 1 True
-    $ sipyco_rpctool 127.0.0.1 3282 call set_channel_current 2 2000
+    $ sipyco_rpctool 127.0.0.1 3282 call set_channel_current_setpoint 2 2000
     $ sipyco_rpctool 127.0.0.1 3282 call get_channel_current_setpoint 2
+    $ sipyco_rpctool 127.0.0.1 3282 call get_cavity_temperature
 
 API
 ---
